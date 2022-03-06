@@ -32,6 +32,7 @@ class AudioPlayerState extends ChangeNotifier {
     await for (var i in JustWaveform.extract(audioInFile: tempFile, waveOutFile: waveFile)) {
       if (i.progress == 1) {
         waveform = i.waveform!;
+        notifyListeners();
       }
     }
   }
