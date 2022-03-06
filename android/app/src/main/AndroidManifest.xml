@@ -1,6 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.audio_player_ui">
    <application
+        android:usesCleartextTraffic="true"
         android:label="audio_player_ui"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
