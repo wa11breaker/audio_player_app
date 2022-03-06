@@ -51,6 +51,7 @@ class AudioWaveformPainter extends CustomPainter {
   final double strokeWidth;
   final double pixelsPerStep;
   final Paint wavePaint;
+  final Paint wavePaint1;
   final Waveform waveform;
   final Duration start;
   final Duration duration;
@@ -63,11 +64,16 @@ class AudioWaveformPainter extends CustomPainter {
     this.scale = 1.0,
     this.strokeWidth = 5.0,
     this.pixelsPerStep = 8.0,
-  }) : wavePaint = Paint()
+  })  : wavePaint = Paint()
           ..style = PaintingStyle.stroke
           ..strokeWidth = strokeWidth
           ..strokeCap = StrokeCap.round
-          ..color = waveColor;
+          ..color = waveColor,
+        wavePaint1 = Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = strokeWidth
+          ..strokeCap = StrokeCap.round
+          ..color = Colors.red;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -81,22 +87,22 @@ class AudioWaveformPainter extends CustomPainter {
     final waveformPixelsPerStep = waveformPixelsPerDevicePixel * pixelsPerStep;
     final sampleOffset = waveform.positionToPixel(start);
     final sampleStart = -sampleOffset % waveformPixelsPerStep;
-    for (var i = sampleStart.toDouble(); i <= waveformPixelsPerWindow + 1.0; i += waveformPixelsPerStep) {
-      final sampleIdx = (sampleOffset + i).toInt();
+    for (var i = 0.0; i <= waveformPixelsPerWindow + 1.0; i += waveformPixelsPerStep) {
+      final sampleIdx = (i).toInt();
       final x = i / waveformPixelsPerDevicePixel;
       final minY = normalise(waveform.getPixelMin(sampleIdx), height);
       final maxY = normalise(waveform.getPixelMax(sampleIdx), height);
       canvas.drawLine(
         Offset(x + strokeWidth / 2, max(strokeWidth * 0.75, minY)),
         Offset(x + strokeWidth / 2, min(height - strokeWidth * 0.75, maxY)),
-        wavePaint,
+        sampleOffset > width ? wavePaint1 : wavePaint,
       );
     }
   }
 
   @override
   bool shouldRepaint(covariant AudioWaveformPainter oldDelegate) {
-    return false;
+    return true;
   }
 
   double normalise(int s, double height) {
