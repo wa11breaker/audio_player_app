@@ -19,6 +19,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   @override
+  void dispose() {
+    super.dispose();
+    ref.read(audioPlayerState).stop();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return const Scaffold(
       body: Center(child: AudioPlayerCard()),

@@ -55,7 +55,8 @@ class AudioPlayerCard extends StatelessWidget {
                           waveform: data.waveform!,
                           duration: data.waveform!.duration,
                           start: data.currentPosition,
-                          waveColor: AppColor.white,
+                          activeWaveColor: AppColor.violet,
+                          inactiveWaveColor: AppColor.white,
                           strokeWidth: 1,
                           pixelsPerStep: 3,
                           scale: 1,
@@ -69,6 +70,7 @@ class AudioPlayerCard extends StatelessWidget {
                 child: Text(
                   getTimeFromDuration(data.totalDuration),
                   style: const TextStyle(
+                    fontSize: 11,
                     color: AppColor.white,
                   ),
                 ),

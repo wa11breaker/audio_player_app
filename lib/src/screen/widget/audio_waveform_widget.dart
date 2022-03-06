@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:just_waveform/just_waveform.dart';
 
 class AudioWaveformWidget extends StatefulWidget {
-  final Color waveColor;
+  final Color activeWaveColor;
+  final Color inactiveWaveColor;
   final double scale;
   final double strokeWidth;
   final double pixelsPerStep;
@@ -17,7 +18,8 @@ class AudioWaveformWidget extends StatefulWidget {
     required this.waveform,
     required this.start,
     required this.duration,
-    this.waveColor = Colors.blue,
+    this.activeWaveColor = Colors.blue,
+    this.inactiveWaveColor = Colors.white,
     this.scale = 1.0,
     this.strokeWidth = 5.0,
     this.pixelsPerStep = 8.0,
@@ -33,7 +35,8 @@ class _AudioWaveformState extends State<AudioWaveformWidget> {
     return ClipRect(
       child: CustomPaint(
         painter: AudioWaveformPainter(
-          waveColor: widget.waveColor,
+          activeWaveColor: widget.activeWaveColor,
+          inactivewaveColor: widget.inactiveWaveColor,
           waveform: widget.waveform,
           start: widget.start,
           duration: widget.duration,
@@ -50,8 +53,8 @@ class AudioWaveformPainter extends CustomPainter {
   final double scale;
   final double strokeWidth;
   final double pixelsPerStep;
-  final Paint wavePaint;
-  final Paint wavePaint1;
+  final Paint activeWavePaint;
+  final Paint inactiveWavePaint;
   final Waveform waveform;
   final Duration start;
   final Duration duration;
@@ -60,20 +63,21 @@ class AudioWaveformPainter extends CustomPainter {
     required this.waveform,
     required this.start,
     required this.duration,
-    Color waveColor = Colors.blue,
+    Color activeWaveColor = Colors.blue,
+    Color inactivewaveColor = Colors.blue,
     this.scale = 1.0,
     this.strokeWidth = 5.0,
     this.pixelsPerStep = 8.0,
-  })  : wavePaint = Paint()
+  })  : activeWavePaint = Paint()
           ..style = PaintingStyle.stroke
           ..strokeWidth = strokeWidth
           ..strokeCap = StrokeCap.round
-          ..color = waveColor,
-        wavePaint1 = Paint()
+          ..color = activeWaveColor,
+        inactiveWavePaint = Paint()
           ..style = PaintingStyle.stroke
           ..strokeWidth = strokeWidth
           ..strokeCap = StrokeCap.round
-          ..color = Colors.red;
+          ..color = inactivewaveColor;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -87,15 +91,16 @@ class AudioWaveformPainter extends CustomPainter {
     final waveformPixelsPerStep = waveformPixelsPerDevicePixel * pixelsPerStep;
     final sampleOffset = waveform.positionToPixel(start);
     final sampleStart = -sampleOffset % waveformPixelsPerStep;
-    for (var i = 0.0; i <= waveformPixelsPerWindow + 1.0; i += waveformPixelsPerStep) {
-      final sampleIdx = (i).toInt();
+    for (var i = sampleStart.toDouble(); i <= waveformPixelsPerWindow + 1.0; i += waveformPixelsPerStep) {
+      print('offset' + sampleOffset.toString());
+      final sampleIdx = (sampleOffset + i).toInt();
       final x = i / waveformPixelsPerDevicePixel;
       final minY = normalise(waveform.getPixelMin(sampleIdx), height);
       final maxY = normalise(waveform.getPixelMax(sampleIdx), height);
       canvas.drawLine(
         Offset(x + strokeWidth / 2, max(strokeWidth * 0.75, minY)),
         Offset(x + strokeWidth / 2, min(height - strokeWidth * 0.75, maxY)),
-        sampleOffset > width ? wavePaint1 : wavePaint,
+        sampleOffset > i ? activeWavePaint : inactiveWavePaint,
       );
     }
   }
